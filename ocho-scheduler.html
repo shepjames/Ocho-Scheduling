@@ -19,6 +19,7 @@
             --gray-600: #757575;
             --gray-800: #424242;
             --danger: #c62828;
+            --gold: #f9a825;
             --radius: 8px;
         }
         body {
@@ -30,29 +31,29 @@
         nav {
             display: flex; align-items: center; justify-content: space-between;
             background: var(--green-dark); color: var(--white);
-            padding: 0 2rem; height: 56px;
+            padding: 0 1.5rem; height: 56px;
         }
-        .nav-brand { font-weight: 700; font-size: 1.1rem; }
-        .nav-links { display: flex; list-style: none; gap: 0.25rem; }
-        .nav-links li { cursor: pointer; padding: 0.5rem 1rem; border-radius: var(--radius); color: rgba(255,255,255,0.85); font-size: 0.95rem; }
+        .nav-brand { font-weight: 700; font-size: 1.1rem; white-space: nowrap; }
+        .nav-links { display: flex; list-style: none; gap: 0.15rem; flex-wrap: wrap; }
+        .nav-links li { cursor: pointer; padding: 0.4rem 0.75rem; border-radius: var(--radius); color: rgba(255,255,255,0.85); font-size: 0.9rem; white-space: nowrap; }
         .nav-links li:hover, .nav-links li.active { background: rgba(255,255,255,0.15); color: var(--white); }
-        main { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; }
+        main { max-width: 1200px; margin: 2rem auto; padding: 0 1.5rem; }
         h1 { margin-bottom: 1.5rem; color: var(--green-dark); }
         h2 { margin-bottom: 1rem; color: var(--green-dark); }
         .page { display: none; }
         .page.active { display: block; }
 
         /* Cards */
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
-        .card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.5rem; text-align: center; }
-        .card h2 { font-size: 2.5rem; color: var(--green); margin-bottom: 0.25rem; }
-        .card p { color: var(--gray-600); margin-bottom: 1rem; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.25rem; margin: 2rem 0; }
+        .card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; text-align: center; }
+        .card h2 { font-size: 2.2rem; color: var(--green); margin-bottom: 0.25rem; }
+        .card p { color: var(--gray-600); margin-bottom: 0.75rem; }
         .quick-start { background: var(--green-bg); border-radius: var(--radius); padding: 1.5rem 2rem; margin-top: 1rem; }
         .quick-start ol { padding-left: 1.25rem; }
         .quick-start li { margin-bottom: 0.5rem; }
 
         /* Buttons */
-        .btn { display: inline-block; padding: 0.5rem 1.25rem; border: 1px solid var(--gray-400); border-radius: var(--radius); background: var(--white); color: var(--gray-800); cursor: pointer; font-size: 0.9rem; }
+        .btn { display: inline-block; padding: 0.5rem 1.1rem; border: 1px solid var(--gray-400); border-radius: var(--radius); background: var(--white); color: var(--gray-800); cursor: pointer; font-size: 0.9rem; }
         .btn:hover { background: var(--gray-100); }
         .btn-primary { background: var(--green); color: var(--white); border-color: var(--green); }
         .btn-primary:hover { background: var(--green-dark); }
@@ -62,42 +63,75 @@
 
         /* Forms */
         .inline-form { display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.5rem; }
-        input[type="text"], input[type="date"] { padding: 0.5rem 0.75rem; border: 1px solid var(--gray-400); border-radius: var(--radius); font-size: 0.95rem; }
+        input[type="text"], input[type="date"], select { padding: 0.5rem 0.75rem; border: 1px solid var(--gray-400); border-radius: var(--radius); font-size: 0.95rem; }
+        select { background: var(--white); }
         .form-section { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; }
         .form-section p { color: var(--gray-600); font-size: 0.9rem; margin-bottom: 0.75rem; }
+        .day-checkboxes { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+        .day-checkboxes label { display: flex; align-items: center; gap: 0.3rem; cursor: pointer; font-size: 0.95rem; }
+        .day-checkboxes input[type="checkbox"] { accent-color: var(--green); width: 16px; height: 16px; }
 
         /* Tables */
         table { width: 100%; border-collapse: collapse; background: var(--white); border-radius: var(--radius); overflow: hidden; border: 1px solid var(--gray-200); }
         th, td { padding: 0.65rem 1rem; text-align: left; border-bottom: 1px solid var(--gray-200); }
-        th { background: var(--gray-100); font-weight: 600; font-size: 0.9rem; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.03em; }
+        th { background: var(--gray-100); font-weight: 600; font-size: 0.85rem; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.03em; }
         tbody tr:hover { background: var(--green-bg); }
 
         /* Availability grid */
         .table-scroll { overflow-x: auto; margin-bottom: 0.5rem; }
-        .avail-table th, .avail-table td { text-align: center; padding: 0.5rem; min-width: 65px; }
-        .avail-table .sticky-col { position: sticky; left: 0; background: var(--white); z-index: 1; text-align: left; min-width: 150px; font-weight: 600; }
+        .avail-table { font-size: 0.85rem; }
+        .avail-table th, .avail-table td { text-align: center; padding: 0.35rem 0.25rem; min-width: 48px; }
+        .avail-table .sticky-col { position: sticky; left: 0; background: var(--white); z-index: 1; text-align: left; min-width: 140px; font-weight: 600; padding-left: 0.5rem; padding-right: 0.5rem; }
         .avail-table thead .sticky-col { background: var(--gray-100); }
-        .avail-table input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--green); }
+        .avail-table thead th { font-size: 0.7rem; line-height: 1.2; }
+        .avail-table .month-header { background: var(--green-bg); color: var(--green-dark); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+        .avail-table input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--green); }
+        .avail-table select.time-sel { font-size: 0.7rem; padding: 0.15rem; border: 1px solid var(--gray-400); border-radius: 3px; background: var(--white); width: 44px; text-align: center; }
+        .avail-table .avail-cell { display: flex; flex-direction: column; align-items: center; gap: 2px; }
         .form-actions { margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
         /* Schedule */
-        .schedule-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.25rem; }
-        .week-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; }
-        .week-card h3 { color: var(--green-dark); margin-bottom: 0.25rem; }
-        .week-date { color: var(--gray-600); font-size: 0.85rem; margin-bottom: 0.75rem; }
+        .month-section { margin-bottom: 2rem; }
+        .month-title { font-size: 1.4rem; color: var(--green-dark); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--green-light); }
+        .schedule-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.25rem; }
+        .day-card { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1.25rem; }
+        .day-card h3 { color: var(--green-dark); margin-bottom: 0.1rem; font-size: 1rem; }
+        .day-card-date { color: var(--gray-600); font-size: 0.85rem; margin-bottom: 0.75rem; }
+        .time-badge { display: inline-block; font-size: 0.7rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 600; margin-left: 0.5rem; }
+        .time-badge.am { background: #e3f2fd; color: #1565c0; }
+        .time-badge.pm { background: #fce4ec; color: #c62828; }
+        .time-badge.all { background: var(--green-bg); color: var(--green-dark); }
+        .match-time-sel { font-size: 0.8rem; padding: 0.2rem 0.4rem; border: 1px solid var(--gray-400); border-radius: 4px; background: var(--white); flex-shrink: 0; }
         .match-list { list-style: none; }
-        .match-list li { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0; border-bottom: 1px solid var(--gray-200); }
-        .match-list li:last-child { border-bottom: none; }
-        .team-name { font-weight: 600; flex: 1; }
-        .vs { color: var(--gray-400); font-size: 0.8rem; font-weight: 700; }
+        .match-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0; border-bottom: 1px solid var(--gray-200); flex-wrap: wrap; }
+        .match-item:last-child { border-bottom: none; }
+        .match-teams { display: flex; align-items: center; gap: 0.4rem; flex: 1; min-width: 0; }
+        .team-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .vs { color: var(--gray-400); font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+        .match-result-btn { padding: 0.2rem 0.5rem; font-size: 0.75rem; border-radius: 4px; cursor: pointer; border: 1px solid var(--gray-400); background: var(--white); }
+        .match-result-btn.winner { background: var(--green); color: var(--white); border-color: var(--green); }
+        .match-result-btn.halved { background: var(--gold); color: var(--gray-800); border-color: var(--gold); }
+
+        /* Standings */
+        .standings-table { margin-top: 1rem; }
+        .standings-table th { text-align: center; }
+        .standings-table th:first-child, .standings-table td:first-child { text-align: center; width: 40px; }
+        .standings-table th:nth-child(2), .standings-table td:nth-child(2) { text-align: left; }
+        .standings-table td { text-align: center; }
+        .standings-table td:nth-child(2) { text-align: left; font-weight: 600; }
+        .rank-1 { color: var(--gold); font-weight: 700; }
+        .standings-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .standings-stat { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem; text-align: center; }
+        .standings-stat .num { font-size: 1.8rem; font-weight: 700; color: var(--green); }
+        .standings-stat .label { font-size: 0.85rem; color: var(--gray-600); }
 
         .alert { padding: 1rem 1.25rem; border-radius: var(--radius); margin-bottom: 1.5rem; font-size: 0.95rem; }
         .alert-success { background: var(--green-bg); color: var(--green-dark); border: 1px solid var(--green-light); }
         .alert-warning { background: #fff9c4; color: #f57f17; border: 1px solid #ffe082; }
         .empty-state { color: var(--gray-600); font-style: italic; padding: 2rem 0; text-align: center; }
         .info { color: var(--gray-600); font-size: 0.9rem; margin-top: 1rem; }
-        .flex-between { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; }
-        .schedule-actions { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .flex-between { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem; }
+        .schedule-actions { display: flex; gap: 0.75rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
     </style>
 </head>
 <body>
@@ -106,9 +140,10 @@
         <ul class="nav-links">
             <li class="active" onclick="showPage('home')">Home</li>
             <li onclick="showPage('teams')">Teams</li>
-            <li onclick="showPage('weeks')">Weeks</li>
+            <li onclick="showPage('dates')">Dates</li>
             <li onclick="showPage('availability')">Availability</li>
             <li onclick="showPage('schedule')">Schedule</li>
+            <li onclick="showPage('standings')">Standings</li>
         </ul>
     </nav>
     <main>
@@ -119,17 +154,19 @@
                 <p style="color:var(--gray-600);font-size:1.15rem">8-Team Match Play Scheduler</p>
             </div>
             <div class="dashboard">
-                <div class="card"><h2 id="stat-teams">0</h2><p>Teams</p><button class="btn" onclick="showPage('teams')">Manage Teams</button></div>
-                <div class="card"><h2 id="stat-weeks">0</h2><p>Weeks</p><button class="btn" onclick="showPage('weeks')">Manage Weeks</button></div>
-                <div class="card"><h2 id="stat-matches">0</h2><p>Matches</p><button class="btn" onclick="showPage('schedule')">View Schedule</button></div>
+                <div class="card"><h2 id="stat-teams">0</h2><p>Teams</p><button class="btn btn-sm" onclick="showPage('teams')">Manage</button></div>
+                <div class="card"><h2 id="stat-dates">0</h2><p>Play Dates</p><button class="btn btn-sm" onclick="showPage('dates')">Manage</button></div>
+                <div class="card"><h2 id="stat-matches">0</h2><p>Matches</p><button class="btn btn-sm" onclick="showPage('schedule')">View</button></div>
+                <div class="card"><h2 id="stat-played">0</h2><p>Completed</p><button class="btn btn-sm" onclick="showPage('standings')">Standings</button></div>
             </div>
             <div class="quick-start">
                 <h2>Getting Started</h2>
                 <ol>
                     <li><strong>Add Teams</strong> &mdash; Set up your 8 teams</li>
-                    <li><strong>Set Up Weeks</strong> &mdash; Generate the weekly slots for your season (Mar 1&ndash;Aug 24)</li>
-                    <li><strong>Enter Availability</strong> &mdash; Each team marks which weeks they can play</li>
-                    <li><strong>Generate Schedule</strong> &mdash; Auto-create the round-robin matchups</li>
+                    <li><strong>Set Up Dates</strong> &mdash; Generate the play dates for your season, picking which days of the week work</li>
+                    <li><strong>Enter Availability</strong> &mdash; Each team marks which specific dates they can play</li>
+                    <li><strong>Generate Schedule</strong> &mdash; Auto-create the round-robin matchups on days both teams are free</li>
+                    <li><strong>Record Results</strong> &mdash; After each match, record the winner and track standings</li>
                 </ol>
             </div>
         </div>
@@ -144,24 +181,34 @@
             <div id="teams-list"></div>
         </div>
 
-        <!-- WEEKS -->
-        <div id="page-weeks" class="page">
-            <h1>Season Weeks</h1>
+        <!-- DATES -->
+        <div id="page-dates" class="page">
+            <h1>Season Dates</h1>
             <div class="form-section">
-                <h2>Generate Weekly Slots</h2>
-                <p>Pick a start and end date. A weekly slot will be created for each week in the range.</p>
+                <h2>Generate Play Dates</h2>
+                <p>Pick a date range and which days of the week to include. A play date slot will be created for each matching day.</p>
                 <div class="inline-form">
-                    <label>Start: <input type="date" id="week-start" value="2026-03-01"></label>
-                    <label>End: <input type="date" id="week-end" value="2026-08-24"></label>
-                    <button class="btn btn-primary" onclick="generateWeeks()">Generate Weeks</button>
+                    <label>Start: <input type="date" id="date-start" value="2026-03-01"></label>
+                    <label>End: <input type="date" id="date-end" value="2026-08-24"></label>
                 </div>
+                <p style="margin-bottom:0.5rem"><strong>Include these days:</strong></p>
+                <div class="day-checkboxes">
+                    <label><input type="checkbox" id="day-0"> Sun</label>
+                    <label><input type="checkbox" id="day-1"> Mon</label>
+                    <label><input type="checkbox" id="day-2"> Tue</label>
+                    <label><input type="checkbox" id="day-3"> Wed</label>
+                    <label><input type="checkbox" id="day-4"> Thu</label>
+                    <label><input type="checkbox" id="day-5"> Fri</label>
+                    <label><input type="checkbox" id="day-6" checked> Sat</label>
+                </div>
+                <button class="btn btn-primary" onclick="generateDates()">Generate Dates</button>
             </div>
-            <div id="weeks-list"></div>
+            <div id="dates-list"></div>
         </div>
 
         <!-- AVAILABILITY -->
         <div id="page-availability" class="page">
-            <h1>Team Availability</h1>
+            <h1>Daily Availability</h1>
             <div id="availability-grid"></div>
         </div>
 
@@ -175,6 +222,12 @@
             <div id="schedule-message"></div>
             <div id="schedule-grid" class="schedule-grid"></div>
         </div>
+
+        <!-- STANDINGS -->
+        <div id="page-standings" class="page">
+            <h1>Standings</h1>
+            <div id="standings-content"></div>
+        </div>
     </main>
 
 <script>
@@ -185,8 +238,16 @@ let data = loadData();
 
 function loadData() {
     const saved = localStorage.getItem('ocho-golf-league');
-    if (saved) return JSON.parse(saved);
-    return { teams: [], weeks: [], availability: {}, matches: [] };
+    if (saved) {
+        const d = JSON.parse(saved);
+        // Migrate: rename 'weeks' to 'dates' if needed
+        if (d.weeks && !d.dates) { d.dates = d.weeks; delete d.weeks; }
+        if (!d.dates) d.dates = [];
+        if (!d.results) d.results = {};
+        if (!d.timePrefs) d.timePrefs = {};
+        return d;
+    }
+    return { teams: [], dates: [], availability: {}, timePrefs: {}, matches: [], results: {} };
 }
 
 function saveData() {
@@ -209,9 +270,10 @@ function showPage(name) {
 function refreshPage(name) {
     if (name === 'home') renderHome();
     else if (name === 'teams') renderTeams();
-    else if (name === 'weeks') renderWeeks();
+    else if (name === 'dates') renderDates();
     else if (name === 'availability') renderAvailability();
     else if (name === 'schedule') renderSchedule();
+    else if (name === 'standings') renderStandings();
 }
 
 // ---------------------------------------------------------------------------
@@ -219,8 +281,10 @@ function refreshPage(name) {
 // ---------------------------------------------------------------------------
 function renderHome() {
     document.getElementById('stat-teams').textContent = data.teams.length;
-    document.getElementById('stat-weeks').textContent = data.weeks.length;
+    document.getElementById('stat-dates').textContent = data.dates.length;
     document.getElementById('stat-matches').textContent = data.matches.length;
+    const played = Object.keys(data.results).filter(k => data.results[k]).length;
+    document.getElementById('stat-played').textContent = played;
 }
 
 // ---------------------------------------------------------------------------
@@ -253,108 +317,169 @@ function addTeam() {
 }
 
 function deleteTeam(i) {
-    if (!confirm(`Delete ${data.teams[i]}?`)) return;
+    if (!confirm('Delete ' + data.teams[i] + '?')) return;
     const name = data.teams[i];
     data.teams.splice(i, 1);
-    // Clean up availability
     Object.keys(data.availability).forEach(key => {
-        if (key.startsWith(name + '||')) delete data.availability[key];
+        if (key.startsWith(name + '||')) { delete data.availability[key]; delete data.timePrefs[key]; }
     });
     data.matches = [];
+    data.results = {};
     saveData();
     renderTeams();
 }
 
 // ---------------------------------------------------------------------------
-// Weeks
+// Dates
 // ---------------------------------------------------------------------------
-function renderWeeks() {
-    const el = document.getElementById('weeks-list');
-    if (data.weeks.length === 0) {
-        el.innerHTML = '<p class="empty-state">No weeks set up yet. Generate weekly slots above.</p>';
+const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function renderDates() {
+    const el = document.getElementById('dates-list');
+    if (data.dates.length === 0) {
+        el.innerHTML = '<p class="empty-state">No play dates set up yet. Generate dates above.</p>';
         return;
     }
-    let html = '<div class="flex-between"><h2>' + data.weeks.length + ' Weeks</h2>';
-    html += '<button class="btn btn-danger btn-sm" onclick="clearWeeks()">Clear All Weeks</button></div>';
-    html += '<table><thead><tr><th>Week</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
-    data.weeks.forEach((w, i) => {
-        const d = new Date(w.date + 'T12:00:00');
-        const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        html += `<tr><td>${w.label}</td><td>${dateStr}</td><td><button class="btn btn-danger btn-sm" onclick="deleteWeek(${i})">Delete</button></td></tr>`;
+    let html = '<div class="flex-between"><h2>' + data.dates.length + ' Play Dates</h2>';
+    html += '<button class="btn btn-danger btn-sm" onclick="clearDates()">Clear All Dates</button></div>';
+    html += '<table><thead><tr><th>#</th><th>Date</th><th>Day</th><th>Actions</th></tr></thead><tbody>';
+    data.dates.forEach((dateStr, i) => {
+        const d = new Date(dateStr + 'T12:00:00');
+        const formatted = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        const dayName = DAY_NAMES[d.getDay()];
+        html += `<tr><td>${i+1}</td><td>${formatted}</td><td>${dayName}</td><td><button class="btn btn-danger btn-sm" onclick="deleteDate(${i})">Delete</button></td></tr>`;
     });
     html += '</tbody></table>';
     el.innerHTML = html;
 }
 
-function generateWeeks() {
-    const startStr = document.getElementById('week-start').value;
-    const endStr = document.getElementById('week-end').value;
+function generateDates() {
+    const startStr = document.getElementById('date-start').value;
+    const endStr = document.getElementById('date-end').value;
     if (!startStr || !endStr) return;
+
+    const selectedDays = [];
+    for (let d = 0; d < 7; d++) {
+        if (document.getElementById('day-' + d).checked) selectedDays.push(d);
+    }
+    if (selectedDays.length === 0) { alert('Select at least one day of the week.'); return; }
 
     let current = new Date(startStr + 'T12:00:00');
     const end = new Date(endStr + 'T12:00:00');
-    let weekNum = data.weeks.length + 1;
-
-    const existingDates = new Set(data.weeks.map(w => w.date));
+    const existingDates = new Set(data.dates);
+    let added = 0;
 
     while (current <= end) {
-        const dateStr = current.toISOString().split('T')[0];
-        if (!existingDates.has(dateStr)) {
-            const month = current.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-            data.weeks.push({ label: 'Week ' + weekNum + ' \u2013 ' + month, date: dateStr });
-            weekNum++;
+        if (selectedDays.includes(current.getDay())) {
+            const dateStr = current.toISOString().split('T')[0];
+            if (!existingDates.has(dateStr)) {
+                data.dates.push(dateStr);
+                existingDates.add(dateStr);
+                added++;
+            }
         }
-        current.setDate(current.getDate() + 7);
+        current.setDate(current.getDate() + 1);
     }
+
+    // Sort dates chronologically
+    data.dates.sort();
     saveData();
-    renderWeeks();
+    renderDates();
+    if (added > 0) alert(added + ' dates added!');
+    else alert('No new dates to add (all already exist).');
 }
 
-function deleteWeek(i) {
-    if (!confirm('Delete ' + data.weeks[i].label + '?')) return;
-    data.weeks.splice(i, 1);
-    data.matches = [];
+function deleteDate(i) {
+    const dateStr = data.dates[i];
+    if (!confirm('Delete ' + dateStr + '?')) return;
+    data.dates.splice(i, 1);
+    // Clean up availability for this date
+    Object.keys(data.availability).forEach(key => {
+        if (key.endsWith('||' + dateStr)) delete data.availability[key];
+    });
+    // Remove matches on this date
+    data.matches = data.matches.filter(m => m.date !== dateStr);
     saveData();
-    renderWeeks();
+    renderDates();
 }
 
-function clearWeeks() {
-    if (!confirm('Delete ALL weeks? This will also clear the schedule.')) return;
-    data.weeks = [];
+function clearDates() {
+    if (!confirm('Delete ALL play dates? This will also clear availability and the schedule.')) return;
+    data.dates = [];
     data.availability = {};
+    data.timePrefs = {};
     data.matches = [];
+    data.results = {};
     saveData();
-    renderWeeks();
+    renderDates();
 }
 
 // ---------------------------------------------------------------------------
-// Availability
+// Availability  (daily grid, grouped by month)
 // ---------------------------------------------------------------------------
 function renderAvailability() {
     const el = document.getElementById('availability-grid');
-    if (data.teams.length === 0 || data.weeks.length === 0) {
+    if (data.teams.length === 0 || data.dates.length === 0) {
         let msg = 'You need to ';
         if (data.teams.length === 0) msg += 'add teams';
-        if (data.teams.length === 0 && data.weeks.length === 0) msg += ' and ';
-        if (data.weeks.length === 0) msg += 'set up weeks';
+        if (data.teams.length === 0 && data.dates.length === 0) msg += ' and ';
+        if (data.dates.length === 0) msg += 'set up play dates';
         msg += ' before entering availability.';
-        el.innerHTML = `<p class="empty-state">${msg}</p>`;
+        el.innerHTML = '<p class="empty-state">' + msg + '</p>';
         return;
     }
 
-    let html = '<p>Check the boxes for each week a team is available to play. Then click <strong>Save</strong>.</p>';
+    // Group dates by month for readability
+    const months = [];
+    let curMonth = null;
+    data.dates.forEach(dateStr => {
+        const d = new Date(dateStr + 'T12:00:00');
+        const monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (monthKey !== curMonth) {
+            curMonth = monthKey;
+            months.push({ key: monthKey, label: d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }), dates: [] });
+        }
+        months[months.length - 1].dates.push(dateStr);
+    });
+
+    let html = '<p style="margin-bottom:0.5rem">Check dates each team is available and pick a time preference (AM, PM, or All Day). Click <strong>Save</strong> when done.</p>';
+    html += '<p style="margin-bottom:1rem;color:var(--gray-600);font-size:0.85rem">Tip: When you check a box, the time defaults to "All". Change the dropdown to AM or PM if the team has a preference.</p>';
     html += '<div class="table-scroll"><table class="avail-table"><thead><tr><th class="sticky-col">Team</th>';
-    data.weeks.forEach(w => {
-        const d = new Date(w.date + 'T12:00:00');
-        html += `<th>${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</th>`;
+
+    // Column headers: grouped by month
+    months.forEach(month => {
+        month.dates.forEach(dateStr => {
+            const d = new Date(dateStr + 'T12:00:00');
+            const dayShort = DAY_SHORT[d.getDay()];
+            const dayNum = d.getDate();
+            html += '<th title="' + dateStr + '">' + dayShort + '<br>' + dayNum + '</th>';
+        });
     });
     html += '</tr></thead><tbody>';
+
+    // Month separator row
+    let monthRow = '<tr class="month-header"><td class="sticky-col" style="background:var(--green-bg)"></td>';
+    months.forEach(month => {
+        monthRow += '<td colspan="' + month.dates.length + '" style="background:var(--green-bg)">' + esc(month.label) + '</td>';
+    });
+    monthRow += '</tr>';
+    html += monthRow;
+
     data.teams.forEach(team => {
-        html += `<tr><td class="sticky-col">${esc(team)}</td>`;
-        data.weeks.forEach((w, wi) => {
-            const key = team + '||' + w.date;
+        html += '<tr><td class="sticky-col">' + esc(team) + '</td>';
+        data.dates.forEach(dateStr => {
+            const key = team + '||' + dateStr;
             const checked = data.availability[key] ? 'checked' : '';
-            html += `<td><input type="checkbox" data-team="${esc(team)}" data-week="${w.date}" ${checked}></td>`;
+            const timePref = data.timePrefs[key] || 'all';
+            html += '<td><div class="avail-cell">';
+            html += '<input type="checkbox" data-team="' + esc(team) + '" data-date="' + dateStr + '" ' + checked + '>';
+            html += '<select class="time-sel" data-team="' + esc(team) + '" data-date="' + dateStr + '">';
+            html += '<option value="all"' + (timePref === 'all' ? ' selected' : '') + '>All</option>';
+            html += '<option value="am"' + (timePref === 'am' ? ' selected' : '') + '>AM</option>';
+            html += '<option value="pm"' + (timePref === 'pm' ? ' selected' : '') + '>PM</option>';
+            html += '</select>';
+            html += '</div></td>';
         });
         html += '</tr>';
     });
@@ -369,10 +494,17 @@ function renderAvailability() {
 
 function saveAvailability() {
     data.availability = {};
+    data.timePrefs = {};
     document.querySelectorAll('.avail-table input[type=checkbox]').forEach(cb => {
         if (cb.checked) {
-            const key = cb.dataset.team + '||' + cb.dataset.week;
+            const key = cb.dataset.team + '||' + cb.dataset.date;
             data.availability[key] = true;
+        }
+    });
+    document.querySelectorAll('.avail-table select.time-sel').forEach(sel => {
+        const key = sel.dataset.team + '||' + sel.dataset.date;
+        if (data.availability[key]) {
+            data.timePrefs[key] = sel.value;
         }
     });
     saveData();
@@ -384,14 +516,14 @@ function toggleAllAvail(checked) {
 }
 
 // ---------------------------------------------------------------------------
-// Schedule generation
+// Schedule generation  (assigns matches to specific dates)
 // ---------------------------------------------------------------------------
 function generateSchedule() {
     if (data.teams.length < 2) { alert('Need at least 2 teams.'); return; }
-    if (data.weeks.length === 0) { alert('Need at least 1 week.'); return; }
+    if (data.dates.length === 0) { alert('Need at least 1 play date.'); return; }
 
     const teams = data.teams;
-    const weeks = data.weeks;
+    const dates = data.dates;
 
     // Build availability set
     const avail = new Set();
@@ -407,8 +539,14 @@ function generateSchedule() {
         }
     }
 
-    // Track bookings
-    const teamBookedWeek = new Set();
+    // Shuffle pairings for fairness
+    for (let i = pairings.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [pairings[i], pairings[j]] = [pairings[j], pairings[i]];
+    }
+
+    // Track bookings: each team plays at most once per date
+    const teamBookedDate = new Set();
     const teamMatchCount = {};
     teams.forEach(t => teamMatchCount[t] = 0);
 
@@ -416,25 +554,35 @@ function generateSchedule() {
     const unscheduled = [];
 
     for (const [t1, t2] of pairings) {
-        let bestWeek = null;
+        let bestDate = null;
         let bestScore = Infinity;
-        for (let wi = 0; wi < weeks.length; wi++) {
-            const w = weeks[wi];
-            const bothAvail = avail.has(t1 + '||' + w.date) && avail.has(t2 + '||' + w.date);
-            const neitherBooked = !teamBookedWeek.has(t1 + '||' + w.date) && !teamBookedWeek.has(t2 + '||' + w.date);
+        for (let di = 0; di < dates.length; di++) {
+            const dateStr = dates[di];
+            const bothAvail = avail.has(t1 + '||' + dateStr) && avail.has(t2 + '||' + dateStr);
+            const neitherBooked = !teamBookedDate.has(t1 + '||' + dateStr) && !teamBookedDate.has(t2 + '||' + dateStr);
             if (bothAvail && neitherBooked) {
-                const score = teamMatchCount[t1] + teamMatchCount[t2];
+                // Prefer spreading matches out: pick date where both teams have fewest matches
+                const score = teamMatchCount[t1] + teamMatchCount[t2] + di * 0.001; // slight preference for earlier dates
                 if (score < bestScore) {
                     bestScore = score;
-                    bestWeek = wi;
+                    bestDate = di;
                 }
             }
         }
-        if (bestWeek !== null) {
-            const w = weeks[bestWeek];
-            scheduled.push({ weekIdx: bestWeek, home: t1, away: t2 });
-            teamBookedWeek.add(t1 + '||' + w.date);
-            teamBookedWeek.add(t2 + '||' + w.date);
+        if (bestDate !== null) {
+            const dateStr = dates[bestDate];
+            // Determine time slot from team preferences
+            const pref1 = data.timePrefs[t1 + '||' + dateStr] || 'all';
+            const pref2 = data.timePrefs[t2 + '||' + dateStr] || 'all';
+            let timeSlot = 'all';
+            if (pref1 === pref2) timeSlot = pref1;
+            else if (pref1 === 'all') timeSlot = pref2;
+            else if (pref2 === 'all') timeSlot = pref1;
+            // If conflicting (am vs pm), default to all day
+            const matchId = t1 + '||' + t2 + '||' + dateStr;
+            scheduled.push({ date: dateStr, home: t1, away: t2, id: matchId, time: timeSlot });
+            teamBookedDate.add(t1 + '||' + dateStr);
+            teamBookedDate.add(t2 + '||' + dateStr);
             teamMatchCount[t1]++;
             teamMatchCount[t2]++;
         } else {
@@ -442,24 +590,33 @@ function generateSchedule() {
         }
     }
 
+    // Sort by date
+    scheduled.sort((a, b) => a.date.localeCompare(b.date));
+
+    // Preserve existing results where match IDs still exist
+    const oldResults = { ...data.results };
     data.matches = scheduled;
+    data.results = {};
+    scheduled.forEach(m => {
+        if (oldResults[m.id]) data.results[m.id] = oldResults[m.id];
+    });
     saveData();
 
     let msg = '';
     if (unscheduled.length > 0) {
-        msg = `Schedule generated with ${scheduled.length} matches. Could not place: ${unscheduled.join(', ')}. Consider adding more available weeks.`;
+        msg = 'Schedule generated with ' + scheduled.length + ' matches. Could not place: ' + unscheduled.join(', ') + '. Consider adding more available dates.';
     } else {
-        const weekCount = new Set(scheduled.map(s => s.weekIdx)).size;
-        msg = `Full round-robin schedule generated: ${scheduled.length} matches across ${weekCount} weeks.`;
+        const dateCount = new Set(scheduled.map(s => s.date)).size;
+        msg = 'Full round-robin schedule generated: ' + scheduled.length + ' matches across ' + dateCount + ' dates.';
     }
-
     renderScheduleContent(msg);
 }
 
 function clearSchedule() {
     if (data.matches.length === 0) return;
-    if (!confirm('Clear the entire schedule?')) return;
+    if (!confirm('Clear the entire schedule and all results?')) return;
     data.matches = [];
+    data.results = {};
     saveData();
     renderSchedule();
 }
@@ -474,37 +631,193 @@ function renderScheduleContent(message) {
 
     if (message) {
         const cls = message.includes('Could not place') ? 'alert-warning' : 'alert-success';
-        msgEl.innerHTML = `<div class="alert ${cls}">${esc(message)}</div>`;
+        msgEl.innerHTML = '<div class="alert ' + cls + '">' + esc(message) + '</div>';
     } else {
         msgEl.innerHTML = '';
     }
 
     if (data.matches.length === 0) {
-        gridEl.innerHTML = '<p class="empty-state">No schedule generated yet. Set up teams, weeks, and availability, then click Generate Schedule.</p>';
+        gridEl.innerHTML = '<p class="empty-state">No schedule generated yet. Set up teams, dates, and availability, then click Generate Schedule.</p>';
         return;
     }
 
-    // Group by week
-    const byWeek = {};
+    // Group by month, then by date within each month
+    const byMonth = {};
     data.matches.forEach(m => {
-        if (!byWeek[m.weekIdx]) byWeek[m.weekIdx] = [];
-        byWeek[m.weekIdx].push(m);
+        const d = new Date(m.date + 'T12:00:00');
+        const monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+        if (!byMonth[monthKey]) byMonth[monthKey] = {};
+        if (!byMonth[monthKey][m.date]) byMonth[monthKey][m.date] = [];
+        byMonth[monthKey][m.date].push(m);
     });
 
     let html = '';
-    const sortedWeeks = Object.keys(byWeek).map(Number).sort((a, b) => a - b);
-    sortedWeeks.forEach(wi => {
-        const w = data.weeks[wi];
-        if (!w) return;
-        const d = new Date(w.date + 'T12:00:00');
-        const dateStr = d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        html += `<div class="week-card"><h3>${esc(w.label)}</h3><p class="week-date">${dateStr}</p><ul class="match-list">`;
-        byWeek[wi].forEach(m => {
-            html += `<li><span class="team-name">${esc(m.home)}</span><span class="vs">vs</span><span class="team-name">${esc(m.away)}</span></li>`;
+    const sortedMonths = Object.keys(byMonth).sort();
+    sortedMonths.forEach(monthKey => {
+        const sampleDate = Object.keys(byMonth[monthKey])[0];
+        const monthDate = new Date(sampleDate + 'T12:00:00');
+        const monthLabel = monthDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const matchesInMonth = Object.values(byMonth[monthKey]).reduce((sum, arr) => sum + arr.length, 0);
+
+        html += '<div class="month-section">';
+        html += '<h2 class="month-title">' + esc(monthLabel) + ' <span style="font-size:0.85rem;color:var(--gray-600);font-weight:400">(' + matchesInMonth + ' matches)</span></h2>';
+        html += '<div class="schedule-grid">';
+
+        const sortedDates = Object.keys(byMonth[monthKey]).sort();
+        sortedDates.forEach(dateStr => {
+            const d = new Date(dateStr + 'T12:00:00');
+            const dayName = DAY_NAMES[d.getDay()];
+            const formatted = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+
+            html += '<div class="day-card">';
+            html += '<h3>' + dayName + ', ' + formatted + '</h3>';
+            html += '<ul class="match-list">';
+            byMonth[monthKey][dateStr].forEach(m => {
+                const result = data.results[m.id] || null;
+                const homeWin = result === 'home';
+                const awayWin = result === 'away';
+                const halved = result === 'halved';
+                const timeSlot = m.time || 'all';
+                const timeLabel = timeSlot === 'am' ? 'AM' : timeSlot === 'pm' ? 'PM' : 'All Day';
+
+                html += '<li class="match-item">';
+                html += '<div class="match-teams">';
+                html += '<span class="team-name" style="' + (homeWin ? 'color:var(--green-dark)' : '') + '">' + esc(m.home) + '</span>';
+                html += '<span class="vs">vs</span>';
+                html += '<span class="team-name" style="' + (awayWin ? 'color:var(--green-dark)' : '') + '">' + esc(m.away) + '</span>';
+                html += '<span class="time-badge ' + timeSlot + '">' + timeLabel + '</span>';
+                html += '</div>';
+                html += '<div style="display:flex;gap:0.25rem;flex-shrink:0;align-items:center">';
+                html += '<select class="match-time-sel" onchange="setMatchTime(\'' + escAttr(m.id) + '\',this.value)" title="Change time slot">';
+                html += '<option value="am"' + (timeSlot === 'am' ? ' selected' : '') + '>AM</option>';
+                html += '<option value="pm"' + (timeSlot === 'pm' ? ' selected' : '') + '>PM</option>';
+                html += '<option value="all"' + (timeSlot === 'all' ? ' selected' : '') + '>All Day</option>';
+                html += '</select>';
+                html += '<button class="match-result-btn' + (homeWin ? ' winner' : '') + '" onclick="setResult(\'' + escAttr(m.id) + '\',\'home\')" title="' + esc(m.home) + ' wins">' + esc(abbrev(m.home)) + '</button>';
+                html += '<button class="match-result-btn' + (halved ? ' halved' : '') + '" onclick="setResult(\'' + escAttr(m.id) + '\',\'halved\')" title="Match halved">TIE</button>';
+                html += '<button class="match-result-btn' + (awayWin ? ' winner' : '') + '" onclick="setResult(\'' + escAttr(m.id) + '\',\'away\')" title="' + esc(m.away) + ' wins">' + esc(abbrev(m.away)) + '</button>';
+                html += '</div>';
+                html += '</li>';
+            });
+            html += '</ul></div>';
         });
-        html += '</ul></div>';
+        html += '</div></div>';
     });
     gridEl.innerHTML = html;
+}
+
+function setMatchTime(matchId, time) {
+    const match = data.matches.find(m => m.id === matchId);
+    if (match) {
+        match.time = time;
+        saveData();
+    }
+}
+
+function setResult(matchId, result) {
+    if (data.results[matchId] === result) {
+        delete data.results[matchId]; // toggle off
+    } else {
+        data.results[matchId] = result;
+    }
+    saveData();
+    renderScheduleContent('');
+}
+
+function abbrev(name) {
+    if (name.length <= 4) return name;
+    return name.substring(0, 3).toUpperCase();
+}
+
+// ---------------------------------------------------------------------------
+// Standings
+// ---------------------------------------------------------------------------
+function renderStandings() {
+    const el = document.getElementById('standings-content');
+
+    if (data.matches.length === 0) {
+        el.innerHTML = '<p class="empty-state">No matches scheduled yet. Generate a schedule first.</p>';
+        return;
+    }
+
+    // Compute standings
+    const stats = {};
+    data.teams.forEach(t => {
+        stats[t] = { wins: 0, losses: 0, halved: 0, played: 0, points: 0 };
+    });
+
+    let totalPlayed = 0;
+    data.matches.forEach(m => {
+        const result = data.results[m.id];
+        if (!result) return;
+        totalPlayed++;
+
+        if (!stats[m.home]) stats[m.home] = { wins: 0, losses: 0, halved: 0, played: 0, points: 0 };
+        if (!stats[m.away]) stats[m.away] = { wins: 0, losses: 0, halved: 0, played: 0, points: 0 };
+
+        stats[m.home].played++;
+        stats[m.away].played++;
+
+        if (result === 'home') {
+            stats[m.home].wins++;
+            stats[m.home].points += 2;
+            stats[m.away].losses++;
+        } else if (result === 'away') {
+            stats[m.away].wins++;
+            stats[m.away].points += 2;
+            stats[m.home].losses++;
+        } else if (result === 'halved') {
+            stats[m.home].halved++;
+            stats[m.away].halved++;
+            stats[m.home].points += 1;
+            stats[m.away].points += 1;
+        }
+    });
+
+    // Sort by points desc, then wins desc, then fewer losses
+    const sorted = Object.keys(stats).sort((a, b) => {
+        if (stats[b].points !== stats[a].points) return stats[b].points - stats[a].points;
+        if (stats[b].wins !== stats[a].wins) return stats[b].wins - stats[a].wins;
+        return stats[a].losses - stats[b].losses;
+    });
+
+    // Summary cards
+    let html = '<div class="standings-summary">';
+    html += '<div class="standings-stat"><div class="num">' + data.matches.length + '</div><div class="label">Total Matches</div></div>';
+    html += '<div class="standings-stat"><div class="num">' + totalPlayed + '</div><div class="label">Completed</div></div>';
+    html += '<div class="standings-stat"><div class="num">' + (data.matches.length - totalPlayed) + '</div><div class="label">Remaining</div></div>';
+    if (sorted.length > 0 && stats[sorted[0]].played > 0) {
+        html += '<div class="standings-stat"><div class="num" style="font-size:1.2rem">' + esc(sorted[0]) + '</div><div class="label">Current Leader</div></div>';
+    }
+    html += '</div>';
+
+    // Standings table
+    html += '<table class="standings-table"><thead><tr>';
+    html += '<th>Rank</th><th>Team</th><th>Played</th><th>W</th><th>L</th><th>T</th><th>Points</th>';
+    html += '</tr></thead><tbody>';
+
+    let rank = 0;
+    let prevPoints = -1;
+    sorted.forEach((team, i) => {
+        const s = stats[team];
+        if (s.points !== prevPoints) { rank = i + 1; prevPoints = s.points; }
+        const rankCls = rank === 1 && s.played > 0 ? ' class="rank-1"' : '';
+        html += '<tr>';
+        html += '<td' + rankCls + '>' + rank + '</td>';
+        html += '<td>' + esc(team) + '</td>';
+        html += '<td>' + s.played + '</td>';
+        html += '<td>' + s.wins + '</td>';
+        html += '<td>' + s.losses + '</td>';
+        html += '<td>' + s.halved + '</td>';
+        html += '<td><strong>' + s.points + '</strong></td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+
+    // Points explanation
+    html += '<p class="info">Scoring: Win = 2 pts, Tie = 1 pt, Loss = 0 pts</p>';
+
+    el.innerHTML = html;
 }
 
 // ---------------------------------------------------------------------------
@@ -514,6 +827,10 @@ function esc(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+
+function escAttr(str) {
+    return str.replace(/'/g, "\\'").replace(/"/g, '&quot;');
 }
 
 // Handle Enter key on team input
