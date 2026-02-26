@@ -78,18 +78,25 @@
         tbody tr:hover { background: var(--green-bg); }
 
         /* Availability */
-        .avail-controls { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.25rem; }
-        .avail-controls select { font-size: 1rem; padding: 0.5rem 0.75rem; min-width: 200px; }
-        .avail-month-summary { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        .avail-month-chip { padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.8rem; cursor: pointer; border: 1px solid var(--gray-400); background: var(--white); }
+        .avail-pickers { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1.25rem; }
+        .avail-pickers label { font-weight: 600; font-size: 0.9rem; }
+        .avail-pickers select { font-size: 1rem; padding: 0.5rem 0.75rem; min-width: 180px; }
+        .avail-month-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+        .avail-month-chip { padding: 0.35rem 0.85rem; border-radius: 20px; font-size: 0.85rem; cursor: pointer; border: 1px solid var(--gray-400); background: var(--white); }
         .avail-month-chip.active { background: var(--green); color: var(--white); border-color: var(--green); }
-        .avail-month-chip .chip-count { font-weight: 700; margin-left: 0.25rem; }
-        .avail-table { font-size: 0.9rem; }
-        .avail-table th, .avail-table td { text-align: center; padding: 0.5rem 0.6rem; }
-        .avail-table th:first-child, .avail-table td:first-child { text-align: left; font-weight: 600; min-width: 150px; }
-        .avail-table input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; accent-color: var(--green); }
-        .avail-table select.time-sel { font-size: 0.8rem; padding: 0.2rem 0.3rem; border: 1px solid var(--gray-400); border-radius: 4px; background: var(--white); }
-        .avail-cell { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+        .avail-month-chip .chip-count { font-weight: 700; margin-left: 0.3rem; }
+        .avail-date-list { list-style: none; }
+        .avail-date-row { display: flex; align-items: center; gap: 1rem; padding: 0.6rem 0.75rem; border-bottom: 1px solid var(--gray-200); background: var(--white); }
+        .avail-date-row:first-child { border-radius: var(--radius) var(--radius) 0 0; }
+        .avail-date-row:last-child { border-bottom: none; border-radius: 0 0 var(--radius) var(--radius); }
+        .avail-date-row:hover { background: var(--green-bg); }
+        .avail-date-row input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
+        .avail-date-row select { font-size: 0.9rem; padding: 0.3rem 0.5rem; border: 1px solid var(--gray-400); border-radius: var(--radius); background: var(--white); }
+        .avail-date-info { flex: 1; }
+        .avail-date-day { font-weight: 600; font-size: 0.95rem; }
+        .avail-date-full { color: var(--gray-600); font-size: 0.85rem; }
+        .avail-team-summary { background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1.25rem; }
+        .avail-team-summary strong { color: var(--green-dark); }
         .form-actions { margin-top: 1rem; display: flex; gap: 0.75rem; flex-wrap: wrap; }
 
         /* Schedule */
@@ -418,8 +425,9 @@ function clearDates() {
 }
 
 // ---------------------------------------------------------------------------
-// Availability  (month-by-month view with dropdown)
+// Availability  (team-by-team, month-by-month vertical list)
 // ---------------------------------------------------------------------------
+let currentAvailTeam = null;
 let currentAvailMonth = null;
 
 function getAvailMonths() {
@@ -450,76 +458,92 @@ function renderAvailability() {
     }
 
     const months = getAvailMonths();
+    if (!currentAvailTeam || !data.teams.includes(currentAvailTeam)) {
+        currentAvailTeam = data.teams[0];
+    }
     if (!currentAvailMonth || !months.find(m => m.key === currentAvailMonth)) {
         currentAvailMonth = months[0].key;
     }
     const activeMonth = months.find(m => m.key === currentAvailMonth);
 
-    // Month picker chips
-    let html = '<p style="margin-bottom:1rem">Select a month, then check the dates each team can play. Set AM/PM preference if needed.</p>';
-    html += '<div class="avail-month-summary">';
+    // Team picker
+    let html = '<div class="avail-pickers">';
+    html += '<label>Team:</label>';
+    html += '<select id="avail-team-select" onchange="switchAvailTeam(this.value)">';
+    data.teams.forEach(team => {
+        const sel = team === currentAvailTeam ? ' selected' : '';
+        const count = data.dates.filter(d => data.availability[team + '||' + d]).length;
+        html += '<option value="' + esc(team) + '"' + sel + '>' + esc(team) + ' (' + count + ' dates)</option>';
+    });
+    html += '</select>';
+    html += '</div>';
+
+    // Month chips
+    html += '<div class="avail-month-chips">';
     months.forEach(month => {
-        // Count how many availability entries exist for this month
         let count = 0;
         month.dates.forEach(dateStr => {
-            data.teams.forEach(team => {
-                if (data.availability[team + '||' + dateStr]) count++;
-            });
+            if (data.availability[currentAvailTeam + '||' + dateStr]) count++;
         });
         const activeCls = month.key === currentAvailMonth ? ' active' : '';
         html += '<button class="avail-month-chip' + activeCls + '" onclick="switchAvailMonth(\'' + month.key + '\')">';
         html += esc(month.label);
-        if (count > 0) html += '<span class="chip-count">(' + count + ')</span>';
+        if (count > 0) html += '<span class="chip-count">' + count + '/' + month.dates.length + '</span>';
         html += '</button>';
     });
     html += '</div>';
 
-    // Table for selected month
-    html += '<table class="avail-table"><thead><tr><th>Team</th>';
+    // Summary for this team
+    const totalAvail = data.dates.filter(d => data.availability[currentAvailTeam + '||' + d]).length;
+    html += '<div class="avail-team-summary"><strong>' + esc(currentAvailTeam) + '</strong> is available for <strong>' + totalAvail + '</strong> of ' + data.dates.length + ' total dates.</div>';
+
+    // Date list for selected month
+    html += '<ul class="avail-date-list" style="border:1px solid var(--gray-200);border-radius:var(--radius)">';
     activeMonth.dates.forEach(dateStr => {
         const d = new Date(dateStr + 'T12:00:00');
-        const dayShort = DAY_SHORT[d.getDay()];
-        const dayNum = d.getDate();
-        html += '<th>' + dayShort + '<br>' + dayNum + '</th>';
-    });
-    html += '</tr></thead><tbody>';
+        const dayName = DAY_NAMES[d.getDay()];
+        const formatted = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        const key = currentAvailTeam + '||' + dateStr;
+        const checked = data.availability[key] ? 'checked' : '';
+        const timePref = data.timePrefs[key] || 'all';
 
-    data.teams.forEach(team => {
-        html += '<tr><td>' + esc(team) + '</td>';
-        activeMonth.dates.forEach(dateStr => {
-            const key = team + '||' + dateStr;
-            const checked = data.availability[key] ? 'checked' : '';
-            const timePref = data.timePrefs[key] || 'all';
-            html += '<td><div class="avail-cell">';
-            html += '<input type="checkbox" data-team="' + esc(team) + '" data-date="' + dateStr + '" ' + checked + '>';
-            html += '<select class="time-sel" data-team="' + esc(team) + '" data-date="' + dateStr + '">';
-            html += '<option value="all"' + (timePref === 'all' ? ' selected' : '') + '>All</option>';
-            html += '<option value="am"' + (timePref === 'am' ? ' selected' : '') + '>AM</option>';
-            html += '<option value="pm"' + (timePref === 'pm' ? ' selected' : '') + '>PM</option>';
-            html += '</select>';
-            html += '</div></td>';
-        });
-        html += '</tr>';
+        html += '<li class="avail-date-row">';
+        html += '<input type="checkbox" data-team="' + esc(currentAvailTeam) + '" data-date="' + dateStr + '" ' + checked + '>';
+        html += '<div class="avail-date-info">';
+        html += '<div class="avail-date-day">' + dayName + '</div>';
+        html += '<div class="avail-date-full">' + formatted + '</div>';
+        html += '</div>';
+        html += '<select data-team="' + esc(currentAvailTeam) + '" data-date="' + dateStr + '" class="time-sel">';
+        html += '<option value="all"' + (timePref === 'all' ? ' selected' : '') + '>All Day</option>';
+        html += '<option value="am"' + (timePref === 'am' ? ' selected' : '') + '>AM</option>';
+        html += '<option value="pm"' + (timePref === 'pm' ? ' selected' : '') + '>PM</option>';
+        html += '</select>';
+        html += '</li>';
     });
-    html += '</tbody></table>';
+    html += '</ul>';
 
     html += '<div class="form-actions">';
-    html += '<button class="btn btn-primary" onclick="saveAvailability()">Save Availability</button>';
+    html += '<button class="btn btn-primary" onclick="saveAvailability()">Save</button>';
     html += '<button class="btn" onclick="toggleMonthAvail(true)">Select All This Month</button>';
     html += '<button class="btn" onclick="toggleMonthAvail(false)">Clear This Month</button>';
     html += '</div>';
     el.innerHTML = html;
 }
 
+function switchAvailTeam(teamName) {
+    saveCurrentViewToData();
+    currentAvailTeam = teamName;
+    renderAvailability();
+}
+
 function switchAvailMonth(monthKey) {
-    // Save current month's checkboxes before switching
-    saveCurrentMonthToData();
+    saveCurrentViewToData();
     currentAvailMonth = monthKey;
     renderAvailability();
 }
 
-function saveCurrentMonthToData() {
-    document.querySelectorAll('.avail-table input[type=checkbox]').forEach(cb => {
+function saveCurrentViewToData() {
+    document.querySelectorAll('.avail-date-list input[type=checkbox]').forEach(cb => {
         const key = cb.dataset.team + '||' + cb.dataset.date;
         if (cb.checked) {
             data.availability[key] = true;
@@ -528,7 +552,7 @@ function saveCurrentMonthToData() {
             delete data.timePrefs[key];
         }
     });
-    document.querySelectorAll('.avail-table select.time-sel').forEach(sel => {
+    document.querySelectorAll('.avail-date-list select.time-sel').forEach(sel => {
         const key = sel.dataset.team + '||' + sel.dataset.date;
         if (data.availability[key]) {
             data.timePrefs[key] = sel.value;
@@ -537,14 +561,14 @@ function saveCurrentMonthToData() {
 }
 
 function saveAvailability() {
-    saveCurrentMonthToData();
+    saveCurrentViewToData();
     saveData();
-    renderAvailability(); // refresh chip counts
+    renderAvailability();
     alert('Availability saved!');
 }
 
 function toggleMonthAvail(checked) {
-    document.querySelectorAll('.avail-table input[type=checkbox]').forEach(cb => cb.checked = checked);
+    document.querySelectorAll('.avail-date-list input[type=checkbox]').forEach(cb => cb.checked = checked);
 }
 
 // ---------------------------------------------------------------------------
