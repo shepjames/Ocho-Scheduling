@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title_suffix %} - {{ team.name }} Availability{% endblock %}
+{% block content %}
+<h1>{{ team.name }}</h1>
+<p>Check the weeks your team is available to play, then click <strong>Save</strong>.</p>
+
+{% if not weeks %}
+<p class="empty-state">No weeks have been set up yet. Check back later.</p>
+{% else %}
+<form action="{{ url_for('update_team_availability', slug=team.slug) }}" method="post">
+    <table>
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Date</th>
+                <th>Available?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for week in weeks %}
+            <tr>
+                <td>{{ week.label }}</td>
+                <td>{{ week.week_date.strftime('%A, %B %d') }}</td>
+                <td style="text-align:center">
+                    <input type="checkbox" name="avail_{{ week.id }}"
+                           {% if week.id in avail_set %}checked{% endif %}
+                           style="width:20px;height:20px;accent-color:#2e7d32;cursor:pointer">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Availability</button>
+        <button type="button" class="btn" onclick="toggleAll(true)">Select All</button>
+        <button type="button" class="btn" onclick="toggleAll(false)">Clear All</button>
+    </div>
+</form>
+
+<script>
+function toggleAll(checked) {
+    document.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = checked);
+}
+</script>
+{% endif %}
+{% endblock %}

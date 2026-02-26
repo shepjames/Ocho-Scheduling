@@ -1,3 +1,4 @@
+import hashlib
 import itertools
 from datetime import date, timedelta
 
@@ -9,6 +10,9 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ocho.db"
 app.config["SECRET_KEY"] = "ocho-golf-league"
 db = SQLAlchemy(app)
 
+# Minimum days between matches for any single team (~1 match per month)
+MIN_DAYS_BETWEEN_MATCHES = 21
+
 # ---------------------------------------------------------------------------
 # Models
 # ---------------------------------------------------------------------------
@@ -16,10 +20,16 @@ db = SQLAlchemy(app)
 class Team(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
+    slug = db.Column(db.String(16), nullable=False, unique=True)
     availabilities = db.relationship("Availability", backref="team", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<Team {self.name}>"
+
+
+def make_slug(name):
+    """Generate a short unique slug from a team name."""
+    return hashlib.md5(name.encode()).hexdigest()[:10]
 
 
 class Week(db.Model):
@@ -65,8 +75,11 @@ def generate_schedule():
     """Generate a round-robin schedule respecting team availability.
 
     For 8 teams the round-robin produces 28 unique pairings (7 rounds of 4).
-    The algorithm tries to place each pairing into a week where both teams
-    are available and neither team already has a match that week.
+    The algorithm places each pairing into a week where:
+      - Both teams are available
+      - Neither team already has a match that week
+      - Neither team has played within MIN_DAYS_BETWEEN_MATCHES days
+    This spreads matches to roughly once per month per team.
     """
     teams = Team.query.order_by(Team.id).all()
     weeks = Week.query.order_by(Week.week_date).all()
@@ -74,35 +87,53 @@ def generate_schedule():
     if len(teams) < 2 or len(weeks) == 0:
         return False, "Need at least 2 teams and 1 week to generate a schedule."
 
-    # Build availability lookup: {(team_id, week_id): True}
+    # Build availability lookup
     avail_set = set()
     for a in Availability.query.all():
         avail_set.add((a.team_id, a.week_id))
 
-    # All unique pairings
-    pairings = list(itertools.combinations(teams, 2))
+    # Build week date lookup
+    week_date = {w.id: w.week_date for w in weeks}
 
-    # Track matches-per-week per team
-    team_week_count = {(t.id, w.id): 0 for t in teams for w in weeks}
-    week_match_count = {w.id: 0 for w in weeks}
+    # Generate round-robin pairings using circle method (balanced rounds)
+    n = len(teams)
+    fixed = teams[0]
+    rotating = list(teams[1:])
+    rounds = []
+    for _ in range(n - 1):
+        current = [fixed] + rotating
+        round_pairs = []
+        for i in range(n // 2):
+            round_pairs.append((current[i], current[n - 1 - i]))
+        rounds.append(round_pairs)
+        rotating = [rotating[-1]] + rotating[:-1]
+
+    # Track the last scheduled date for each team
+    team_last_match_date = {t.id: date.min for t in teams}
+    # Track which teams are booked per week
+    team_booked_week = set()
 
     scheduled = []
     unscheduled = []
 
-    for t1, t2 in pairings:
-        placed = False
-        for w in weeks:
-            both_available = (t1.id, w.id) in avail_set and (t2.id, w.id) in avail_set
-            neither_booked = team_week_count[(t1.id, w.id)] == 0 and team_week_count[(t2.id, w.id)] == 0
-            if both_available and neither_booked:
-                scheduled.append((w.id, t1.id, t2.id))
-                team_week_count[(t1.id, w.id)] = 1
-                team_week_count[(t2.id, w.id)] = 1
-                week_match_count[w.id] += 1
-                placed = True
-                break
-        if not placed:
-            unscheduled.append((t1.name, t2.name))
+    for round_pairs in rounds:
+        for t1, t2 in round_pairs:
+            placed = False
+            for w in weeks:
+                both_available = (t1.id, w.id) in avail_set and (t2.id, w.id) in avail_set
+                neither_booked = (t1.id, w.id) not in team_booked_week and (t2.id, w.id) not in team_booked_week
+                t1_rested = (week_date[w.id] - team_last_match_date[t1.id]).days >= MIN_DAYS_BETWEEN_MATCHES
+                t2_rested = (week_date[w.id] - team_last_match_date[t2.id]).days >= MIN_DAYS_BETWEEN_MATCHES
+                if both_available and neither_booked and t1_rested and t2_rested:
+                    scheduled.append((w.id, t1.id, t2.id))
+                    team_booked_week.add((t1.id, w.id))
+                    team_booked_week.add((t2.id, w.id))
+                    team_last_match_date[t1.id] = week_date[w.id]
+                    team_last_match_date[t2.id] = week_date[w.id]
+                    placed = True
+                    break
+            if not placed:
+                unscheduled.append((t1.name, t2.name))
 
     # Clear existing matches and write new ones
     Match.query.delete()
@@ -142,7 +173,7 @@ def add_team():
     if name:
         existing = Team.query.filter_by(name=name).first()
         if not existing:
-            db.session.add(Team(name=name))
+            db.session.add(Team(name=name, slug=make_slug(name)))
             db.session.commit()
     return redirect(url_for("teams"))
 
@@ -225,6 +256,32 @@ def update_availability():
                 db.session.add(Availability(team_id=team.id, week_id=week.id))
     db.session.commit()
     return redirect(url_for("availability"))
+
+
+@app.route("/team/<slug>")
+def team_availability(slug):
+    """Per-team availability page. Each team gets a unique link."""
+    team = Team.query.filter_by(slug=slug).first_or_404()
+    weeks = Week.query.order_by(Week.week_date).all()
+    avail_set = set()
+    for a in Availability.query.filter_by(team_id=team.id).all():
+        avail_set.add(a.week_id)
+    return render_template("team_availability.html", team=team, weeks=weeks, avail_set=avail_set)
+
+
+@app.route("/team/<slug>/update", methods=["POST"])
+def update_team_availability(slug):
+    """Save availability for a single team."""
+    team = Team.query.filter_by(slug=slug).first_or_404()
+    weeks = Week.query.all()
+    # Clear this team's availability only
+    Availability.query.filter_by(team_id=team.id).delete()
+    for week in weeks:
+        key = f"avail_{week.id}"
+        if key in request.form:
+            db.session.add(Availability(team_id=team.id, week_id=week.id))
+    db.session.commit()
+    return redirect(url_for("team_availability", slug=slug))
 
 
 # ---- Schedule ----

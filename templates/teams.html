@@ -14,6 +14,7 @@
         <tr>
             <th>#</th>
             <th>Team Name</th>
+            <th>Availability Link</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -22,6 +23,7 @@
         <tr>
             <td>{{ loop.index }}</td>
             <td>{{ team.name }}</td>
+            <td><a href="{{ url_for('team_availability', slug=team.slug) }}">{{ url_for('team_availability', slug=team.slug, _external=True) }}</a></td>
             <td>
                 <form action="{{ url_for('delete_team', team_id=team.id) }}" method="post" class="inline"
                       onsubmit="return confirm('Delete {{ team.name }}? This will also remove their availability and matches.')">
