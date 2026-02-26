@@ -10,9 +10,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ocho.db"
 app.config["SECRET_KEY"] = "ocho-golf-league"
 db = SQLAlchemy(app)
 
-# Minimum days between matches for any single team (~1 match per month)
-MIN_DAYS_BETWEEN_MATCHES = 21
-
 # ---------------------------------------------------------------------------
 # Models
 # ---------------------------------------------------------------------------
@@ -74,12 +71,11 @@ class Match(db.Model):
 def generate_schedule():
     """Generate a round-robin schedule respecting team availability.
 
-    For 8 teams the round-robin produces 28 unique pairings (7 rounds of 4).
-    The algorithm places each pairing into a week where:
-      - Both teams are available
-      - Neither team already has a match that week
-      - Neither team has played within MIN_DAYS_BETWEEN_MATCHES days
-    This spreads matches to roughly once per month per team.
+    For 8 teams the round-robin produces 28 unique pairings.
+    The algorithm places each pairing into a week where both teams are
+    available and neither team already has a match that week.  It picks
+    the week where each team has the fewest existing matches so that
+    games spread out evenly across the season.
     """
     teams = Team.query.order_by(Team.id).all()
     weeks = Week.query.order_by(Week.week_date).all()
@@ -92,48 +88,38 @@ def generate_schedule():
     for a in Availability.query.all():
         avail_set.add((a.team_id, a.week_id))
 
-    # Build week date lookup
-    week_date = {w.id: w.week_date for w in weeks}
+    # All unique pairings
+    pairings = list(itertools.combinations(teams, 2))
 
-    # Generate round-robin pairings using circle method (balanced rounds)
-    n = len(teams)
-    fixed = teams[0]
-    rotating = list(teams[1:])
-    rounds = []
-    for _ in range(n - 1):
-        current = [fixed] + rotating
-        round_pairs = []
-        for i in range(n // 2):
-            round_pairs.append((current[i], current[n - 1 - i]))
-        rounds.append(round_pairs)
-        rotating = [rotating[-1]] + rotating[:-1]
-
-    # Track the last scheduled date for each team
-    team_last_match_date = {t.id: date.min for t in teams}
     # Track which teams are booked per week
     team_booked_week = set()
+    # Track total matches per team to spread evenly
+    team_match_count = {t.id: 0 for t in teams}
 
     scheduled = []
     unscheduled = []
 
-    for round_pairs in rounds:
-        for t1, t2 in round_pairs:
-            placed = False
-            for w in weeks:
-                both_available = (t1.id, w.id) in avail_set and (t2.id, w.id) in avail_set
-                neither_booked = (t1.id, w.id) not in team_booked_week and (t2.id, w.id) not in team_booked_week
-                t1_rested = (week_date[w.id] - team_last_match_date[t1.id]).days >= MIN_DAYS_BETWEEN_MATCHES
-                t2_rested = (week_date[w.id] - team_last_match_date[t2.id]).days >= MIN_DAYS_BETWEEN_MATCHES
-                if both_available and neither_booked and t1_rested and t2_rested:
-                    scheduled.append((w.id, t1.id, t2.id))
-                    team_booked_week.add((t1.id, w.id))
-                    team_booked_week.add((t2.id, w.id))
-                    team_last_match_date[t1.id] = week_date[w.id]
-                    team_last_match_date[t2.id] = week_date[w.id]
-                    placed = True
-                    break
-            if not placed:
-                unscheduled.append((t1.name, t2.name))
+    for t1, t2 in pairings:
+        # Find all valid weeks, then pick the one where these teams
+        # have the fewest total matches (spreads games out)
+        best_week = None
+        best_score = float("inf")
+        for w in weeks:
+            both_available = (t1.id, w.id) in avail_set and (t2.id, w.id) in avail_set
+            neither_booked = (t1.id, w.id) not in team_booked_week and (t2.id, w.id) not in team_booked_week
+            if both_available and neither_booked:
+                score = team_match_count[t1.id] + team_match_count[t2.id]
+                if score < best_score:
+                    best_score = score
+                    best_week = w
+        if best_week:
+            scheduled.append((best_week.id, t1.id, t2.id))
+            team_booked_week.add((t1.id, best_week.id))
+            team_booked_week.add((t2.id, best_week.id))
+            team_match_count[t1.id] += 1
+            team_match_count[t2.id] += 1
+        else:
+            unscheduled.append((t1.name, t2.name))
 
     # Clear existing matches and write new ones
     Match.query.delete()
