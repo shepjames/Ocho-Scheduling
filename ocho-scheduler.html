@@ -249,9 +249,14 @@ function loadData() {
     const saved = localStorage.getItem('ocho-golf-league');
     if (saved) {
         const d = JSON.parse(saved);
-        // Migrate: rename 'weeks' to 'dates' if needed
-        if (d.weeks && !d.dates) { d.dates = d.weeks; delete d.weeks; }
+        // Migrate: old 'weeks' were objects {label, date} — extract date strings
+        if (d.weeks && !d.dates) {
+            d.dates = d.weeks.map(w => typeof w === 'string' ? w : w.date).filter(Boolean);
+            delete d.weeks;
+        }
         if (!d.dates) d.dates = [];
+        // Ensure all dates are plain strings, not objects
+        d.dates = d.dates.map(item => typeof item === 'string' ? item : (item && item.date ? item.date : null)).filter(Boolean);
         if (!d.results) d.results = {};
         if (!d.timePrefs) d.timePrefs = {};
         return d;
@@ -354,10 +359,12 @@ function renderDates() {
     html += '<button class="btn btn-danger btn-sm" onclick="clearDates()">Clear All Dates</button></div>';
     html += '<table><thead><tr><th>#</th><th>Date</th><th>Day</th><th>Actions</th></tr></thead><tbody>';
     data.dates.forEach((dateStr, i) => {
+        if (!dateStr || typeof dateStr !== 'string') return;
         const d = new Date(dateStr + 'T12:00:00');
+        if (isNaN(d.getTime())) return;
         const formatted = d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         const dayName = DAY_NAMES[d.getDay()];
-        html += `<tr><td>${i+1}</td><td>${formatted}</td><td>${dayName}</td><td><button class="btn btn-danger btn-sm" onclick="deleteDate(${i})">Delete</button></td></tr>`;
+        html += '<tr><td>' + (i+1) + '</td><td>' + formatted + '</td><td>' + dayName + '</td><td><button class="btn btn-danger btn-sm" onclick="deleteDate(' + i + ')">Delete</button></td></tr>';
     });
     html += '</tbody></table>';
     el.innerHTML = html;
@@ -434,7 +441,9 @@ function getAvailMonths() {
     const months = [];
     let curMonth = null;
     data.dates.forEach(dateStr => {
+        if (!dateStr || typeof dateStr !== 'string') return;
         const d = new Date(dateStr + 'T12:00:00');
+        if (isNaN(d.getTime())) return; // skip invalid dates
         const monthKey = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
         if (monthKey !== curMonth) {
             curMonth = monthKey;
@@ -458,6 +467,10 @@ function renderAvailability() {
     }
 
     const months = getAvailMonths();
+    if (months.length === 0) {
+        el.innerHTML = '<p class="empty-state">No valid play dates found. Go to the Dates tab and generate dates first.</p>';
+        return;
+    }
     if (!currentAvailTeam || !data.teams.includes(currentAvailTeam)) {
         currentAvailTeam = data.teams[0];
     }
