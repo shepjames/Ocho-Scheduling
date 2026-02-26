@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title_suffix %} - Weeks{% endblock %}
+{% block content %}
+<h1>Season Weeks</h1>
+
+<div class="form-section">
+    <h2>Generate Weekly Slots</h2>
+    <p>Pick a start and end date. A weekly slot will be created for each Monday (or your chosen start day) in the range.</p>
+    <form action="{{ url_for('generate_weeks') }}" method="post" class="inline-form">
+        <label>Start: <input type="date" name="start_date" value="2026-01-05" required></label>
+        <label>End: <input type="date" name="end_date" value="2026-09-28" required></label>
+        <button type="submit" class="btn btn-primary">Generate Weeks</button>
+    </form>
+</div>
+
+{% if weeks %}
+<div class="flex-between">
+    <h2>{{ weeks|length }} Weeks</h2>
+    <form action="{{ url_for('clear_weeks') }}" method="post"
+          onsubmit="return confirm('Delete ALL weeks? This will also clear availability and the schedule.')">
+        <button type="submit" class="btn btn-danger btn-sm">Clear All Weeks</button>
+    </form>
+</div>
+<table>
+    <thead>
+        <tr>
+            <th>Week</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for week in weeks %}
+        <tr>
+            <td>{{ week.label }}</td>
+            <td>{{ week.week_date.strftime('%A, %B %d, %Y') }}</td>
+            <td>
+                <form action="{{ url_for('delete_week', week_id=week.id) }}" method="post" class="inline"
+                      onsubmit="return confirm('Delete {{ week.label }}?')">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty-state">No weeks set up yet. Generate weekly slots above to define your season.</p>
+{% endif %}
+{% endblock %}

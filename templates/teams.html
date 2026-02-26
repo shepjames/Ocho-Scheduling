@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title_suffix %} - Teams{% endblock %}
+{% block content %}
+<h1>Teams</h1>
+
+<form action="{{ url_for('add_team') }}" method="post" class="inline-form">
+    <input type="text" name="name" placeholder="Team name" required maxlength="100">
+    <button type="submit" class="btn btn-primary">Add Team</button>
+</form>
+
+{% if teams %}
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Team Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for team in teams %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ team.name }}</td>
+            <td>
+                <form action="{{ url_for('delete_team', team_id=team.id) }}" method="post" class="inline"
+                      onsubmit="return confirm('Delete {{ team.name }}? This will also remove their availability and matches.')">
+                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="empty-state">No teams yet. Add your 8 teams above to get started.</p>
+{% endif %}
+
+<p class="info">{{ teams|length }} / 8 teams added</p>
+{% endblock %}

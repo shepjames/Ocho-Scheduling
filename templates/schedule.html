@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title_suffix %} - Schedule{% endblock %}
+{% block content %}
+<h1>Match Schedule</h1>
+
+<div class="schedule-actions">
+    <form action="{{ url_for('generate') }}" method="post" class="inline">
+        <button type="submit" class="btn btn-primary">Generate Schedule</button>
+    </form>
+    {% if schedule_data %}
+    <form action="{{ url_for('clear_schedule') }}" method="post" class="inline"
+          onsubmit="return confirm('Clear the entire schedule?')">
+        <button type="submit" class="btn btn-danger">Clear Schedule</button>
+    </form>
+    {% endif %}
+</div>
+
+{% if message %}
+<div class="alert {% if 'Could not place' in message %}alert-warning{% else %}alert-success{% endif %}">
+    {{ message }}
+</div>
+{% endif %}
+
+{% if schedule_data %}
+<div class="schedule-grid">
+    {% for item in schedule_data %}
+    <div class="week-card">
+        <h3>{{ item.week.label }}</h3>
+        <p class="week-date">{{ item.week.week_date.strftime('%A, %B %d, %Y') }}</p>
+        <ul class="match-list">
+            {% for match in item.matches %}
+            <li>
+                <span class="team-name">{{ match.home_team.name }}</span>
+                <span class="vs">vs</span>
+                <span class="team-name">{{ match.away_team.name }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
+</div>
+{% elif not message %}
+<p class="empty-state">
+    No schedule generated yet. Make sure you have
+    <a href="{{ url_for('teams') }}">teams</a>,
+    <a href="{{ url_for('weeks') }}">weeks</a>, and
+    <a href="{{ url_for('availability') }}">availability</a> set up,
+    then click <strong>Generate Schedule</strong>.
+</p>
+{% endif %}
+{% endblock %}

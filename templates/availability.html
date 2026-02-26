@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title_suffix %} - Availability{% endblock %}
+{% block content %}
+<h1>Team Availability</h1>
+
+{% if not teams or not weeks %}
+<p class="empty-state">
+    You need to
+    {% if not teams %}add <a href="{{ url_for('teams') }}">teams</a>{% endif %}
+    {% if not teams and not weeks %} and {% endif %}
+    {% if not weeks %}set up <a href="{{ url_for('weeks') }}">weeks</a>{% endif %}
+    before entering availability.
+</p>
+{% else %}
+<p>Check the boxes for each week a team is available to play. Then click <strong>Save</strong>.</p>
+
+<form action="{{ url_for('update_availability') }}" method="post">
+    <div class="table-scroll">
+        <table class="avail-table">
+            <thead>
+                <tr>
+                    <th class="sticky-col">Team</th>
+                    {% for week in weeks %}
+                    <th class="week-header">
+                        <div>{{ week.week_date.strftime('%b %d') }}</div>
+                    </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for team in teams %}
+                <tr>
+                    <td class="sticky-col">{{ team.name }}</td>
+                    {% for week in weeks %}
+                    <td class="avail-cell">
+                        <input type="checkbox" name="avail_{{ team.id }}_{{ week.id }}"
+                               {% if (team.id, week.id) in avail_set %}checked{% endif %}>
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save Availability</button>
+        <button type="button" class="btn" onclick="toggleAll(true)">Select All</button>
+        <button type="button" class="btn" onclick="toggleAll(false)">Clear All</button>
+    </div>
+</form>
+
+<script>
+function toggleAll(checked) {
+    document.querySelectorAll('.avail-table input[type=checkbox]').forEach(cb => cb.checked = checked);
+}
+</script>
+{% endif %}
+{% endblock %}

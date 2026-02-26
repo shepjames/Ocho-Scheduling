@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocho Golf League{% block title_suffix %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <div class="nav-brand"><a href="/">Ocho Golf League</a></div>
+        <ul class="nav-links">
+            <li><a href="{{ url_for('teams') }}" {% if request.path.startswith('/teams') %}class="active"{% endif %}>Teams</a></li>
+            <li><a href="{{ url_for('weeks') }}" {% if request.path.startswith('/weeks') %}class="active"{% endif %}>Weeks</a></li>
+            <li><a href="{{ url_for('availability') }}" {% if request.path.startswith('/availability') %}class="active"{% endif %}>Availability</a></li>
+            <li><a href="{{ url_for('schedule') }}" {% if request.path.startswith('/schedule') %}class="active"{% endif %}>Schedule</a></li>
+        </ul>
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

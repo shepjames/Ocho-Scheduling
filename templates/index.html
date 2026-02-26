@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero">
+    <h1>Ocho Golf League</h1>
+    <p class="subtitle">8-Team Match Play Scheduler</p>
+</div>
+
+<div class="dashboard">
+    <div class="card">
+        <h2>{{ teams|length }}</h2>
+        <p>Teams</p>
+        <a href="{{ url_for('teams') }}" class="btn">Manage Teams</a>
+    </div>
+    <div class="card">
+        <h2>{{ weeks|length }}</h2>
+        <p>Weeks</p>
+        <a href="{{ url_for('weeks') }}" class="btn">Manage Weeks</a>
+    </div>
+    <div class="card">
+        <h2>{{ matches|length }}</h2>
+        <p>Matches Scheduled</p>
+        <a href="{{ url_for('schedule') }}" class="btn">View Schedule</a>
+    </div>
+</div>
+
+<div class="quick-start">
+    <h2>Getting Started</h2>
+    <ol>
+        <li><strong>Add Teams</strong> &mdash; Set up your 8 teams</li>
+        <li><strong>Set Up Weeks</strong> &mdash; Generate the weekly slots for your season (Jan&ndash;Sep)</li>
+        <li><strong>Enter Availability</strong> &mdash; Each team marks which weeks they can play</li>
+        <li><strong>Generate Schedule</strong> &mdash; Auto-create the round-robin matchups</li>
+    </ol>
+</div>
+{% endblock %}
