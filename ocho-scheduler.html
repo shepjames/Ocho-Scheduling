@@ -169,8 +169,8 @@
                 <h2>Getting Started</h2>
                 <ol>
                     <li><strong>Add Teams</strong> &mdash; Set up your 8 teams</li>
-                    <li><strong>Set Up Dates</strong> &mdash; Generate the play dates for your season, picking which days of the week work</li>
-                    <li><strong>Enter Availability</strong> &mdash; Each team marks which specific dates they can play</li>
+                    <li><strong>Set Season Range</strong> &mdash; On the Dates tab, set the start and end dates for your season (defaults to Mar&ndash;Aug 2026)</li>
+                    <li><strong>Enter Availability</strong> &mdash; Each team marks which days they can play (every day of each month is listed)</li>
                     <li><strong>Generate Schedule</strong> &mdash; Auto-create the round-robin matchups on days both teams are free</li>
                     <li><strong>Record Results</strong> &mdash; After each match, record the winner and track standings</li>
                 </ol>
@@ -437,30 +437,44 @@ function clearDates() {
 let currentAvailTeamIdx = 0;
 let currentAvailMonthIdx = 0;
 
-function getValidDates() {
-    // Filter to only valid date strings
-    return data.dates.filter(function(d) {
-        return d && typeof d === 'string' && d.match(/^\d{4}-\d{2}-\d{2}$/) && !isNaN(new Date(d + 'T12:00:00').getTime());
-    });
-}
+function getSeasonMonths() {
+    // Read season range from date inputs (or use defaults)
+    var startInput = document.getElementById('date-start');
+    var endInput = document.getElementById('date-end');
+    var startStr = (startInput && startInput.value) || '2026-03-01';
+    var endStr = (endInput && endInput.value) || '2026-08-31';
 
-function getAvailMonths(validDates) {
-    var months = [];
-    var curKey = '';
-    for (var i = 0; i < validDates.length; i++) {
-        var dateStr = validDates[i];
-        var d = new Date(dateStr + 'T12:00:00');
-        var key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
-        if (key !== curKey) {
-            curKey = key;
-            months.push({
-                key: key,
-                label: d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-                dates: []
-            });
-        }
-        months[months.length - 1].dates.push(dateStr);
+    var start = new Date(startStr + 'T12:00:00');
+    var end = new Date(endStr + 'T12:00:00');
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        start = new Date('2026-03-01T12:00:00');
+        end = new Date('2026-08-31T12:00:00');
     }
+
+    var months = [];
+    var year = start.getFullYear();
+    var month = start.getMonth();
+    var endYear = end.getFullYear();
+    var endMonth = end.getMonth();
+
+    while (year < endYear || (year === endYear && month <= endMonth)) {
+        var daysInMonth = new Date(year, month + 1, 0).getDate();
+        var dates = [];
+        for (var day = 1; day <= daysInMonth; day++) {
+            var dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+            dates.push(dateStr);
+        }
+        var label = new Date(year, month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        months.push({
+            key: year + '-' + String(month + 1).padStart(2, '0'),
+            label: label,
+            dates: dates
+        });
+        month++;
+        if (month > 11) { month = 0; year++; }
+    }
+
     return months;
 }
 
@@ -469,29 +483,23 @@ function renderAvailability() {
 
     try {
         // Check prerequisites
-        if (data.teams.length === 0 && data.dates.length === 0) {
-            el.innerHTML = '<p class="empty-state">Add teams and set up play dates first, then come back here.</p>';
-            return;
-        }
         if (data.teams.length === 0) {
-            el.innerHTML = '<p class="empty-state">Add teams on the Teams tab first.</p>';
-            return;
-        }
-        if (data.dates.length === 0) {
-            el.innerHTML = '<p class="empty-state">Generate play dates on the Dates tab first.</p>';
+            el.innerHTML = '<p class="empty-state">Add teams on the Teams tab first, then come back here to set availability.</p>';
             return;
         }
 
-        var validDates = getValidDates();
-        if (validDates.length === 0) {
-            el.innerHTML = '<div class="alert alert-warning">Your saved dates appear to be corrupted. Please go to the <strong>Dates</strong> tab, click <strong>Clear All Dates</strong>, and re-generate them.</div>';
-            return;
-        }
-
-        var months = getAvailMonths(validDates);
+        var months = getSeasonMonths();
         if (months.length === 0) {
-            el.innerHTML = '<p class="empty-state">No valid months found. Re-generate dates on the Dates tab.</p>';
+            el.innerHTML = '<p class="empty-state">No season months found. Check the start/end dates on the Dates tab.</p>';
             return;
+        }
+
+        // Build flat list of all season dates for counting
+        var allSeasonDates = [];
+        for (var si = 0; si < months.length; si++) {
+            for (var sj = 0; sj < months[si].dates.length; sj++) {
+                allSeasonDates.push(months[si].dates[sj]);
+            }
         }
 
         // Clamp indices
@@ -510,7 +518,7 @@ function renderAvailability() {
         html += '<select id="avail-team-sel" onchange="switchAvailTeam(this.selectedIndex)">';
         for (var ti = 0; ti < data.teams.length; ti++) {
             var t = data.teams[ti];
-            var tCount = validDates.filter(function(d) { return data.availability[t + '||' + d]; }).length;
+            var tCount = allSeasonDates.filter(function(d) { return data.availability[t + '||' + d]; }).length;
             html += '<option' + (ti === currentAvailTeamIdx ? ' selected' : '') + '>' + esc(t) + ' (' + tCount + ' dates)</option>';
         }
         html += '</select>';
@@ -531,8 +539,8 @@ function renderAvailability() {
         html += '</div>';
 
         // Summary
-        var totalAvail = validDates.filter(function(d) { return data.availability[team + '||' + d]; }).length;
-        html += '<div class="avail-summary"><strong>' + esc(team) + '</strong> is available for <strong>' + totalAvail + '</strong> of ' + validDates.length + ' total play dates.</div>';
+        var totalAvail = allSeasonDates.filter(function(d) { return data.availability[team + '||' + d]; }).length;
+        html += '<div class="avail-summary"><strong>' + esc(team) + '</strong> is available for <strong>' + totalAvail + '</strong> of ' + allSeasonDates.length + ' total season days.</div>';
 
         // Date list
         html += '<ul class="avail-date-list" style="border:1px solid var(--gray-200);border-radius:var(--radius)">';
@@ -629,10 +637,22 @@ function resetAllData() {
 // ---------------------------------------------------------------------------
 function generateSchedule() {
     if (data.teams.length < 2) { alert('Need at least 2 teams.'); return; }
-    if (data.dates.length === 0) { alert('Need at least 1 play date.'); return; }
+
+    // Collect all unique dates from availability (any date a team marked as available)
+    const dateSet = new Set();
+    Object.keys(data.availability).forEach(key => {
+        if (data.availability[key]) {
+            const parts = key.split('||');
+            if (parts.length === 2 && parts[1].match(/^\d{4}-\d{2}-\d{2}$/)) {
+                dateSet.add(parts[1]);
+            }
+        }
+    });
+    const dates = Array.from(dateSet).sort();
+
+    if (dates.length === 0) { alert('No availability set. Go to the Availability tab and mark available dates for each team first.'); return; }
 
     const teams = data.teams;
-    const dates = data.dates;
 
     // Build availability set
     const avail = new Set();
